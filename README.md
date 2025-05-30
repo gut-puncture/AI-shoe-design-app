@@ -1,3 +1,14 @@
+---
+title: AI Shoe Designer
+emoji: 👟
+colorFrom: blue
+colorTo: purple
+sdk: gradio
+sdk_version: "4.44.0"
+app_file: app.py
+pinned: false
+---
+
 # 🦶 AI Shoe Designer
 
 A powerful Gradio web application that combines OpenAI's o3-2025-04-16 model for design consultation and fal.ai's Imagen4 model for image generation to help you create innovative shoe designs.
