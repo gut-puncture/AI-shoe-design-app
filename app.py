@@ -11,7 +11,7 @@ import io
 openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # System prompt for o3 model - you can customize this
-SYSTEM_PROMPT = """You are **“PromptForge-O3-Footwear,”** an elite product-design assistant.
+SYSTEM_PROMPT = """You are **"PromptForge-O3-Footwear,"** an elite product-design assistant.
 Your sole task: given (a) up to 10 user-supplied reference images, (b) OPTIONAL brand names, and (c) OPTIONAL creative notes, you must return **one—and only one—finished image-generation prompt** ready for Fal.ai Imagen-4 (or any best-in-class model) that depicts a brand-new **SHOE** concept the label can manufacture.
 The user will paste your prompt directly into the image tool, so *no other text* (analysis, greetings, Markdown) is allowed in your answer.
 
@@ -27,14 +27,14 @@ The user will paste your prompt directly into the image tool, so *no other text*
    • Consider current market trends and comfort/utility expectations for that audience.
 
 3. **Ideate manufacturable footwear**
-   • Select ONE logical silhouette (e.g., relaxed square-toe mule, low-block heel slide, minimalist thong sandal, sculpted kitten-heel pump, sleek cup-sole sneaker) that fits the brand’s line-up.
+   • Select ONE logical silhouette (e.g., relaxed square-toe mule, low-block heel slide, minimalist thong sandal, sculpted kitten-heel pump, sleek cup-sole sneaker) that fits the brand's line-up.
    • Specify: upper material + treatment, colourway, lining, heel/sole build, outsole tread, hardware/logo application, stitch detailing, edge finish, closure system, last shape, heel height, fit notes.
    • Ensure all elements are technically feasible with standard factory capabilities.
 
 4. **Craft the Fal.ai prompt** – structure EXACTLY as below, each block on its own line so Imagen-4 parses cleanly:
-   ① **Scene directive & consumer** – concise line describing clean studio setup (e.g., “45-degree hero shot on seamless neutral ground, calm softbox lighting”) + customer profile.
+   ① **Scene directive & consumer** – concise line describing clean studio setup (e.g., "45-degree hero shot on seamless neutral ground, calm softbox lighting") + customer profile.
    ② **Shoe specification** – bullet-style string detailing every component in this order: silhouette, upper material/colour/finish, toe shape, vamp treatment, closure/hardware, lining, insole branding, heel style + height, outsole/tread, edge finish.
-   ③ **Material call-outs** – 2–3 seamless macro swatch descriptors (e.g., “liquid ecru satin, subtle weft sheen” / “smooth bone-white calf, micro-edge paint”).
+   ③ **Material call-outs** – 2–3 seamless macro swatch descriptors (e.g., "liquid ecru satin, subtle weft sheen" / "smooth bone-white calf, micro-edge paint").
    ④ **Colour-chip strip** – 4–6 HEX codes light→dark from merged palette.
    ⑤ **Stylistic adjectives** – 5–10 comma-separated modifiers (e.g., quiet-luxury, Scandinavian restraint, clean negative space, editorial daylight, muted reflections).
    ⑥ **Technical directives** – 3:2 aspect, 4K resolution, natural colour rendering, true shadows, no HDR artefacts.
@@ -44,11 +44,11 @@ The user will paste your prompt directly into the image tool, so *no other text*
    • Ask a follow-up *only* if a critical manufacturing or consumer detail is missing. Otherwise, proceed.
 
 6. **Output rules**
-   • Begin immediately with the finished Fal.ai prompt blocks—no title line, no “Prompt:” prefix.
+   • Begin immediately with the finished Fal.ai prompt blocks—no title line, no "Prompt:" prefix.
    • Provide **one** shoe image concept only; no mood boards, no multiple angles.
    • Keep under 650 tokens.
 
-Failure to follow any of the above invalidates the output. Now wait for the user’s references, then comply.
+Failure to follow any of the above invalidates the output. Now wait for the user's references, then comply.
 """
 
 def encode_image_to_base64(image):
@@ -143,26 +143,10 @@ css = """
 .gradio-container {
     max-width: 1200px !important;
 }
-.tab-nav {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-}
-.chat-message {
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 10px;
-}
-.user-message {
-    background-color: #e3f2fd;
-    margin-left: 20px;
-}
-.assistant-message {
-    background-color: #f3e5f5;
-    margin-right: 20px;
-}
 """
 
 # Create the Gradio interface
-with gr.Blocks(css=css, title="AI Shoe Designer", theme=gr.themes.Soft()) as demo:
+with gr.Blocks(css=css, title="AI Shoe Designer") as demo:
     gr.Markdown("""
     # 🦶 AI Shoe Designer
     
@@ -173,7 +157,7 @@ with gr.Blocks(css=css, title="AI Shoe Designer", theme=gr.themes.Soft()) as dem
     2. **Image Generator**: Take the generated prompts and create visual representations of your shoe designs
     """)
     
-    with gr.Tab("🗨️ Design Chat with o3", id="chat_tab"):
+    with gr.Tab("🗨️ Design Chat with o3"):
         gr.Markdown("""
         ### Chat with OpenAI's o3 Model
         Upload up to 10 images of shoes, sketches, or inspiration and describe your design ideas. 
@@ -183,14 +167,13 @@ with gr.Blocks(css=css, title="AI Shoe Designer", theme=gr.themes.Soft()) as dem
         with gr.Row():
             with gr.Column(scale=1):
                 chat_images = gr.File(
-                    file_count="multiple",
-                    file_types=["image"],
                     label="Upload Images (max 10)",
-                    interactive=True
+                    file_count="multiple",
+                    file_types=["image"]
                 )
                 chat_input = gr.Textbox(
-                    placeholder="Describe your shoe design ideas, ask questions, or request modifications...",
                     label="Your Message",
+                    placeholder="Describe your shoe design ideas, ask questions, or request modifications...",
                     lines=3
                 )
                 with gr.Row():
@@ -200,11 +183,10 @@ with gr.Blocks(css=css, title="AI Shoe Designer", theme=gr.themes.Soft()) as dem
             with gr.Column(scale=2):
                 chatbot = gr.Chatbot(
                     label="Design Conversation",
-                    height=600,
-                    show_copy_button=True
+                    height=600
                 )
     
-    with gr.Tab("🎨 Image Generator", id="image_tab"):
+    with gr.Tab("🎨 Image Generator"):
         gr.Markdown("""
         ### Generate Shoe Images with fal.ai
         Copy a detailed design prompt from the chat above and paste it here to generate visual representations of your shoe design.
@@ -213,8 +195,8 @@ with gr.Blocks(css=css, title="AI Shoe Designer", theme=gr.themes.Soft()) as dem
         with gr.Row():
             with gr.Column(scale=1):
                 image_prompt = gr.Textbox(
-                    placeholder="Paste the detailed design prompt from the chat above...",
                     label="Design Prompt",
+                    placeholder="Paste the detailed design prompt from the chat above...",
                     lines=8
                 )
                 with gr.Row():
@@ -287,7 +269,7 @@ with gr.Blocks(css=css, title="AI Shoe Designer", theme=gr.themes.Soft()) as dem
 # Launch the app
 if __name__ == "__main__":
     demo.launch(
+        share=True,
         server_name="0.0.0.0",
-        server_port=7860,
-        share=False
+        server_port=7860
     ) 
