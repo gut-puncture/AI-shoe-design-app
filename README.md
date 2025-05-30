@@ -20,28 +20,45 @@ A powerful Gradio web application that combines OpenAI's o3-2025-04-16 model for
 
 ## Deployment on Hugging Face Spaces
 
-### Step 1: Prepare Your Repository
-
-1. Create a new repository on GitHub with the files from this project
-2. Ensure all files are committed and pushed to your GitHub repository
-
-### Step 2: Create Hugging Face Space
+### Step 1: Create Hugging Face Space
 
 1. Go to [Hugging Face Spaces](https://huggingface.co/spaces)
 2. Click "Create new Space"
-3. Choose:
-   - **Space name**: `ai-shoe-designer` (or your preferred name)
-   - **License**: Apache 2.0
-   - **Space SDK**: Gradio
-   - **Space hardware**: CPU Basic (upgrade to GPU if needed for better performance)
+3. Configure your space:
+   - **Owner**: Your Hugging Face username
+   - **Space name**: `AI-shoe-design-app` (or your preferred name)
+   - **SDK**: Gradio
+   - **Hardware**: CPU Basic (free) or upgrade as needed
+   - **Visibility**: Public
 
-### Step 3: Connect to GitHub
+### Step 2: Get Hugging Face API Token
 
-1. In your new Space, go to "Settings" > "Repository"
-2. Connect your GitHub repository
-3. The Space will automatically sync with your repo
+1. Go to [Hugging Face Settings > Access Tokens](https://huggingface.co/settings/tokens)
+2. Click "New token"
+3. Configure:
+   - **Name**: `github-sync` (or similar)
+   - **Role**: **Write** (required for pushing to spaces)
+4. Copy the generated token
 
-### Step 4: Set Environment Variables
+### Step 3: Configure GitHub Secrets
+
+1. Go to your GitHub repository settings
+2. Navigate to **Settings** → **Secrets and variables** → **Actions**
+3. Click "New repository secret"
+4. Add:
+   - **Name**: `HF_TOKEN`
+   - **Secret**: Your Hugging Face token from Step 2
+
+### Step 4: Automatic Sync with GitHub Actions
+
+This repository includes GitHub Actions that automatically sync your code to Hugging Face Spaces:
+
+- **`.github/workflows/sync_to_hf.yml`**: Syncs code on every push to main branch
+- **`.github/workflows/check_file_size.yml`**: Ensures files are under 10MB limit
+
+The sync happens automatically when you push to the main branch. You can also trigger it manually from the GitHub Actions tab.
+
+### Step 5: Set Environment Variables in Hugging Face
 
 In your Hugging Face Space settings, add these environment variables:
 
@@ -62,14 +79,10 @@ FAL_KEY=your_fal_ai_api_key_here
   2. Sign up/login and go to your dashboard
   3. Generate an API key
 
-### Step 5: Configure Space
+### Step 6: Access Your Space
 
-Create an `app.py` file in your Space (if not already synced from GitHub) and ensure the requirements.txt includes all dependencies.
-
-### Step 6: Launch
-
-Once environment variables are set, your Space will automatically restart and be available at:
-`https://huggingface.co/spaces/YOUR_USERNAME/ai-shoe-designer`
+Once everything is configured, your Space will be available at:
+`https://huggingface.co/spaces/YOUR_USERNAME/AI-shoe-design-app`
 
 ## Local Development
 
@@ -115,10 +128,14 @@ The app will be available at `http://localhost:7860`
 
 ```
 ai-shoe-designer/
-├── app.py              # Main Gradio application
-├── requirements.txt    # Python dependencies
-├── README.md          # This documentation
-└── .gitignore         # Git ignore file
+├── app.py                              # Main Gradio application
+├── requirements.txt                    # Python dependencies
+├── README.md                          # This documentation
+├── .gitignore                         # Git ignore file
+├── vercel.json                        # Vercel configuration (optional)
+└── .github/workflows/
+    ├── sync_to_hf.yml                 # Auto-sync to Hugging Face
+    └── check_file_size.yml            # File size validation
 ```
 
 ## Troubleshooting
@@ -133,11 +150,15 @@ ai-shoe-designer/
    - Verify your FAL_KEY is correct
    - Check fal.ai service status
 
-3. **Memory errors with large images**
+3. **GitHub Actions sync failing**
+   - Ensure `HF_TOKEN` secret is set correctly with **Write** permissions
+   - Check that your Hugging Face Space exists and name matches the workflow
+
+4. **Memory errors with large images**
    - Try reducing image file sizes before upload
    - Consider upgrading to GPU hardware on Hugging Face Spaces
 
-4. **Slow response times**
+5. **Slow response times**
    - Upgrade to GPU hardware on Hugging Face Spaces
    - Consider reducing the number of images uploaded simultaneously
 
