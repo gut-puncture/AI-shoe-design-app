@@ -93,7 +93,7 @@ def chat_with_o3(message: str, images: List[Image.Image], history: List[Tuple[st
             model="o3-2025-04-16",
             messages=messages,
             max_completion_tokens=4000,
-            reasoning_effort="medium"
+            reasoning_effort="high"
         )
         
         assistant_response = response.choices[0].message.content
