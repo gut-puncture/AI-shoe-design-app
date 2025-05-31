@@ -70,18 +70,18 @@ def encode_image_to_base64(image):
 def call_openai_with_fallback(messages):
     """Call OpenAI API with model fallback logic"""
     # Try o3 first, then fall back to other models if access is restricted
-    models_to_try = ["o3", "gpt-4o", "gpt-4-turbo"]
+    models_to_try = ["o4-mini-2025-04-16", "gpt-4o", "gpt-4-turbo"]
     
     for model in models_to_try:
         try:
             logger.info(f"Trying model: {model}")
             
-            if model == "o3":
+            if model == "o4-mini-2025-04-16":
                 response = openai_client.chat.completions.create(
                     model=model,
                     messages=messages,
                     max_completion_tokens=4000,
-                    reasoning_effort="medium"
+                    reasoning_effort="high"
                 )
             else:
                 response = openai_client.chat.completions.create(
