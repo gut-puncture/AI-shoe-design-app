@@ -10,28 +10,140 @@ pinned: false
 license: mit
 ---
 
-# AI Shoe Designer
+# 🦶 AI Shoe Designer
 
-An AI-powered tool for creating innovative shoe designs using OpenAI's o3 model and fal.ai's image generation.
+A modern web application that helps you design shoes using AI-powered assistance. Upload up to 10 reference images, describe your design ideas, and get detailed design specifications plus generated shoe images.
 
 ## Features
 
-- **Design Chat**: Upload images and chat with AI to generate detailed design specifications
-- **Image Generator**: Generate visual representations of shoe designs
+- **Multi-Image Upload**: Upload up to 10 reference images at once
+- **AI-Powered Design Chat**: Get detailed shoe design specifications using OpenAI's o3 model
+- **Image Generation**: Generate visual shoe designs using Fal.ai Imagen-4
+- **Modern UI**: Beautiful, responsive interface with drag-and-drop file uploads
+- **Vercel-Ready**: Optimized for deployment on Vercel
+
+## Tech Stack
+
+- **Backend**: Flask (Python)
+- **Frontend**: Vanilla HTML/CSS/JavaScript
+- **AI Models**: OpenAI o3, Fal.ai Imagen-4
+- **Deployment**: Vercel
+
+## Quick Start
+
+### Environment Variables
+
+Create a `.env` file in your project root:
+
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+FAL_KEY=your_fal_api_key_here
+```
+
+### Local Development
+
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+2. Run the application:
+```bash
+python app.py
+```
+
+3. Open your browser and go to `http://localhost:5000`
+
+### Deploy to Vercel
+
+1. Install Vercel CLI:
+```bash
+npm i -g vercel
+```
+
+2. Set up environment variables in Vercel:
+```bash
+vercel env add OPENAI_API_KEY
+vercel env add FAL_KEY
+```
+
+3. Deploy:
+```bash
+vercel --prod
+```
 
 ## Usage
 
-1. Go to the "Design Chat" tab
-2. Upload an image of shoes, sketches, or inspiration
-3. Describe your design ideas in the text box
-4. Get detailed design specifications from the AI
-5. Copy the generated prompt to the "Image Generator" tab
-6. Generate visual representations of your shoe design
+1. **Design Chat Tab**:
+   - Upload up to 10 reference images (drag & drop or click to upload)
+   - Describe your shoe design ideas in the text area
+   - Click "Generate Design Specification"
+   - Get detailed AI-generated design specifications
 
-## Requirements
+2. **Image Generator Tab**:
+   - Copy the design prompt from the chat (auto-filled)
+   - Click "Generate Shoe Design"
+   - View your generated shoe image
 
-- OpenAI API key (set as OPENAI_API_KEY environment variable)
-- fal.ai API key (set as FAL_KEY environment variable)
+## API Endpoints
+
+- `GET /` - Main application interface
+- `POST /api/chat` - Chat with AI for design specifications
+- `POST /api/generate` - Generate shoe images
+
+## File Structure
+
+```
+ai-shoe-designer/
+├── app.py              # Flask application
+├── requirements.txt    # Python dependencies
+├── vercel.json        # Vercel configuration
+├── templates/
+│   └── index.html     # Main UI template
+└── README.md          # This file
+```
+
+## Features Overview
+
+### Multiple Image Upload
+- Supports up to 10 images simultaneously
+- Drag and drop interface
+- Image preview with removal options
+- Automatic file type validation
+
+### AI Design Assistant
+- Powered by OpenAI's o3 model with high reasoning effort
+- Analyzes multiple reference images
+- Generates detailed, manufacturable shoe specifications
+- Considers brand DNA, target audience, and market trends
+
+### Image Generation
+- Uses Fal.ai Imagen-4 for high-quality shoe visualizations
+- 1:1 aspect ratio optimized for shoe designs
+- Real-time generation with loading indicators
+
+### Modern UI/UX
+- Responsive design for all devices
+- Beautiful gradient backgrounds
+- Smooth animations and transitions
+- Professional tab-based interface
+- Error handling and user feedback
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - feel free to use this project for your own needs!
+
+## Support
+
+If you encounter any issues or have questions, please open an issue in the repository.
 
 ## Deployment on Hugging Face Spaces
 
@@ -139,20 +251,6 @@ The app will be available at `http://localhost:7860`
 - Internet connection for API calls
 - Sufficient RAM for image processing (recommended: 4GB+)
 
-## File Structure
-
-```
-ai-shoe-designer/
-├── app.py                              # Main Gradio application
-├── requirements.txt                    # Python dependencies
-├── README.md                          # This documentation
-├── .gitignore                         # Git ignore file
-├── vercel.json                        # Vercel configuration (optional)
-└── .github/workflows/
-    ├── sync_to_hf.yml                 # Auto-sync to Hugging Face
-    └── check_file_size.yml            # File size validation
-```
-
 ## Troubleshooting
 
 ### Common Issues
@@ -182,18 +280,6 @@ ai-shoe-designer/
 - **For better o3 responses**: Provide clear, detailed descriptions along with your images
 - **For better image generation**: Use the detailed prompts generated by o3 rather than generic descriptions
 - **For faster performance**: Upgrade to GPU hardware on Hugging Face Spaces
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
 
 ## Disclaimer
 

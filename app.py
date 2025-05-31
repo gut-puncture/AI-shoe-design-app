@@ -1,10 +1,15 @@
-import gradio as gr
+from flask import Flask, request, jsonify, render_template
 import openai
 import fal_client
 import os
 import base64
 from PIL import Image
 import io
+import tempfile
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Initialize clients
 openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -57,12 +62,20 @@ def encode_image_to_base64(image):
     img_str = base64.b64encode(buffered.getvalue()).decode()
     return f"data:image/png;base64,{img_str}"
 
-def chat_with_o3(message, image_file):
-    """Chat with OpenAI o3 model with image support"""
-    if not message and not image_file:
-        return "Please provide a message or upload an image."
-    
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/api/chat', methods=['POST'])
+def chat_api():
+    """API endpoint for chat with o3 model"""
     try:
+        message = request.form.get('message', '')
+        files = request.files.getlist('images')
+        
+        if not message and not files:
+            return jsonify({'error': 'Please provide a message or upload images.'}), 400
+        
         # Prepare messages for the API
         messages = [{"role": "developer", "content": SYSTEM_PROMPT}]
         
@@ -73,18 +86,22 @@ def chat_with_o3(message, image_file):
         if message:
             current_message_content.append({"type": "text", "text": message})
         
-        # Add image if provided
-        if image_file is not None:
-            try:
-                # Open and process the image
-                pil_img = Image.open(image_file)
-                base64_image = encode_image_to_base64(pil_img)
-                current_message_content.append({
-                    "type": "image_url",
-                    "image_url": {"url": base64_image}
-                })
-            except Exception as e:
-                return f"Error processing image: {e}"
+        # Add images if provided (up to 10)
+        if files:
+            processed_images = 0
+            for file in files[:10]:  # Limit to 10 images
+                if file and file.filename:
+                    try:
+                        # Open and process the image
+                        pil_img = Image.open(file.stream)
+                        base64_image = encode_image_to_base64(pil_img)
+                        current_message_content.append({
+                            "type": "image_url",
+                            "image_url": {"url": base64_image}
+                        })
+                        processed_images += 1
+                    except Exception as e:
+                        continue  # Skip invalid images
         
         if current_message_content:
             messages.append({"role": "user", "content": current_message_content})
@@ -98,17 +115,21 @@ def chat_with_o3(message, image_file):
         )
         
         assistant_response = response.choices[0].message.content
-        return assistant_response
+        return jsonify({'response': assistant_response})
         
     except Exception as e:
-        return f"Error calling OpenAI API: {str(e)}"
+        return jsonify({'error': f'Error calling OpenAI API: {str(e)}'}), 500
 
-def generate_image_with_fal(prompt):
-    """Generate image using fal.ai imagen4/preview model"""
-    if not prompt or not prompt.strip():
-        return None
-        
+@app.route('/api/generate', methods=['POST'])
+def generate_image_api():
+    """API endpoint for image generation using fal.ai"""
     try:
+        data = request.get_json()
+        prompt = data.get('prompt', '').strip()
+        
+        if not prompt:
+            return jsonify({'error': 'Please provide a prompt.'}), 400
+        
         # Call fal.ai API
         result = fal_client.subscribe(
             "fal-ai/imagen4/preview",
@@ -121,36 +142,12 @@ def generate_image_with_fal(prompt):
         
         if result and "images" in result and len(result["images"]) > 0:
             image_url = result["images"][0]["url"]
-            return image_url
+            return jsonify({'image_url': image_url})
         else:
-            return None
+            return jsonify({'error': 'Failed to generate image'}), 500
             
     except Exception as e:
-        return None
+        return jsonify({'error': f'Error generating image: {str(e)}'}), 500
 
-# Create the main Gradio interface using simple approach
-demo = gr.TabbedInterface([
-    gr.Interface(
-        fn=chat_with_o3,
-        inputs=[
-            gr.Textbox(label="Your Message", placeholder="Describe your shoe design ideas...", lines=3),
-            gr.File(label="Upload Image", type="filepath")
-        ],
-        outputs=gr.Textbox(label="AI Response", lines=10),
-        title="🗨️ Design Chat with o3",
-        description="Upload an image and describe your design ideas. The AI will create detailed design specifications.",
-        article="Upload an image of shoes, sketches, or inspiration and describe your design ideas."
-    ),
-    gr.Interface(
-        fn=generate_image_with_fal,
-        inputs=gr.Textbox(label="Design Prompt", placeholder="Paste prompt from chat...", lines=8),
-        outputs=gr.Image(label="Generated Shoe Design"),
-        title="🎨 Image Generator", 
-        description="Generate visual representations of your shoe design using detailed prompts.",
-        article="Copy the design prompt from the chat above and generate your shoe image."
-    )
-], ["Design Chat", "Image Generator"], title="🦶 AI Shoe Designer")
-
-# Launch the app
 if __name__ == "__main__":
-    demo.launch() 
+    app.run(debug=True) 
