@@ -3,7 +3,6 @@ import openai
 import fal_client
 import os
 import base64
-from typing import List, Tuple, Optional
 from PIL import Image
 import io
 
@@ -58,10 +57,10 @@ def encode_image_to_base64(image):
     img_str = base64.b64encode(buffered.getvalue()).decode()
     return f"data:image/png;base64,{img_str}"
 
-def chat_with_o3(message, *image_files):
+def chat_with_o3(message, image_file):
     """Chat with OpenAI o3 model with image support"""
-    if not message and not any(image_files):
-        return "Please provide a message or upload images."
+    if not message and not image_file:
+        return "Please provide a message or upload an image."
     
     try:
         # Prepare messages for the API
@@ -74,20 +73,18 @@ def chat_with_o3(message, *image_files):
         if message:
             current_message_content.append({"type": "text", "text": message})
         
-        # Add images (up to 10)
-        if image_files:
-            for image_file in image_files[:10]:
-                if image_file is not None:
-                    try:
-                        # Open and process the image
-                        pil_img = Image.open(image_file)
-                        base64_image = encode_image_to_base64(pil_img)
-                        current_message_content.append({
-                            "type": "image_url",
-                            "image_url": {"url": base64_image}
-                        })
-                    except Exception as e:
-                        print(f"Error processing image: {e}")
+        # Add image if provided
+        if image_file is not None:
+            try:
+                # Open and process the image
+                pil_img = Image.open(image_file)
+                base64_image = encode_image_to_base64(pil_img)
+                current_message_content.append({
+                    "type": "image_url",
+                    "image_url": {"url": base64_image}
+                })
+            except Exception as e:
+                return f"Error processing image: {e}"
         
         if current_message_content:
             messages.append({"role": "user", "content": current_message_content})
@@ -131,93 +128,28 @@ def generate_image_with_fal(prompt):
     except Exception as e:
         return None
 
-# Create the main Gradio interface
-with gr.Blocks(title="🦶 AI Shoe Designer", theme=gr.themes.Soft()) as demo:
-    
-    gr.Markdown("""
-    # 🦶 AI Shoe Designer
-    
-    Welcome to the AI Shoe Designer! This tool helps you create innovative shoe designs using cutting-edge AI.
-    
-    ## How to use:
-    1. **Design Chat**: Upload up to 10 images and chat with our AI to generate detailed design specifications
-    2. **Image Generator**: Take the generated prompts and create visual representations of your shoe designs
-    """)
-    
-    with gr.Tab("🗨️ Design Chat with o3"):
-        gr.Markdown("""
-        ### Chat with OpenAI's o3 Model
-        Upload up to 10 images of shoes, sketches, or inspiration and describe your design ideas. 
-        The AI will help you create detailed design specifications and prompts for shoe creation.
-        """)
-        
-        with gr.Row():
-            with gr.Column(scale=1):
-                # User input
-                chat_message = gr.Textbox(
-                    label="Your Message",
-                    placeholder="Describe your shoe design ideas, ask questions, or request modifications...",
-                    lines=3
-                )
-                
-                # File uploads (up to 10 images)
-                with gr.Row():
-                    img1 = gr.File(label="Image 1", file_types=["image"])
-                    img2 = gr.File(label="Image 2", file_types=["image"])
-                    img3 = gr.File(label="Image 3", file_types=["image"])
-                    img4 = gr.File(label="Image 4", file_types=["image"])
-                    img5 = gr.File(label="Image 5", file_types=["image"])
-                
-                with gr.Row():
-                    img6 = gr.File(label="Image 6", file_types=["image"])
-                    img7 = gr.File(label="Image 7", file_types=["image"])
-                    img8 = gr.File(label="Image 8", file_types=["image"])
-                    img9 = gr.File(label="Image 9", file_types=["image"])
-                    img10 = gr.File(label="Image 10", file_types=["image"])
-                
-                chat_btn = gr.Button("Send Message", variant="primary")
-            
-            with gr.Column(scale=2):
-                # AI response
-                chat_output = gr.Textbox(
-                    label="AI Response",
-                    lines=15,
-                    interactive=False
-                )
-    
-    with gr.Tab("🎨 Image Generator"):
-        gr.Markdown("""
-        ### Generate Shoe Images with fal.ai
-        Copy a detailed design prompt from the chat above and paste it here to generate visual representations of your shoe design.
-        """)
-        
-        with gr.Row():
-            with gr.Column(scale=1):
-                image_prompt = gr.Textbox(
-                    label="Design Prompt",
-                    placeholder="Paste the detailed design prompt from the chat above...",
-                    lines=8
-                )
-                generate_btn = gr.Button("Generate Image", variant="primary")
-            
-            with gr.Column(scale=1):
-                generated_image = gr.Image(
-                    label="Generated Shoe Design",
-                    height=400
-                )
-    
-    # Event handlers
-    chat_btn.click(
+# Create the main Gradio interface using simple approach
+demo = gr.TabbedInterface([
+    gr.Interface(
         fn=chat_with_o3,
-        inputs=[chat_message, img1, img2, img3, img4, img5, img6, img7, img8, img9, img10],
-        outputs=chat_output
-    )
-    
-    generate_btn.click(
+        inputs=[
+            gr.Textbox(label="Your Message", placeholder="Describe your shoe design ideas...", lines=3),
+            gr.File(label="Upload Image", type="filepath")
+        ],
+        outputs=gr.Textbox(label="AI Response", lines=10),
+        title="🗨️ Design Chat with o3",
+        description="Upload an image and describe your design ideas. The AI will create detailed design specifications.",
+        article="Upload an image of shoes, sketches, or inspiration and describe your design ideas."
+    ),
+    gr.Interface(
         fn=generate_image_with_fal,
-        inputs=image_prompt,
-        outputs=generated_image
+        inputs=gr.Textbox(label="Design Prompt", placeholder="Paste prompt from chat...", lines=8),
+        outputs=gr.Image(label="Generated Shoe Design"),
+        title="🎨 Image Generator", 
+        description="Generate visual representations of your shoe design using detailed prompts.",
+        article="Copy the design prompt from the chat above and generate your shoe image."
     )
+], ["Design Chat", "Image Generator"], title="🦶 AI Shoe Designer")
 
 # Launch the app
 if __name__ == "__main__":

@@ -1,33 +1,37 @@
 ---
 title: AI Shoe Designer
-emoji: 👟
+emoji: 🦶
 colorFrom: blue
 colorTo: purple
 sdk: gradio
-sdk_version: "4.44.0"
+sdk_version: 5.32.0
 app_file: app.py
 pinned: false
+license: mit
 ---
 
-# 🦶 AI Shoe Designer
+# AI Shoe Designer
 
-A powerful Gradio web application that combines OpenAI's o3-2025-04-16 model for design consultation and fal.ai's Imagen4 model for image generation to help you create innovative shoe designs.
+An AI-powered tool for creating innovative shoe designs using OpenAI's o3 model and fal.ai's image generation.
 
 ## Features
 
-- **🗨️ Design Chat with o3**: Upload up to 10 images and chat with OpenAI's advanced o3 model to generate detailed shoe design specifications
-- **🎨 Image Generator**: Use fal.ai's Imagen4 model to create visual representations of your shoe designs
-- **🖼️ Multi-format Image Support**: Supports various image formats including .webp, .jpg, .png, etc.
-- **💬 Interactive Chat**: Continuous conversation with context retention
-- **📋 Copy-Paste Workflow**: Easy transfer of design prompts between chat and image generation
+- **Design Chat**: Upload images and chat with AI to generate detailed design specifications
+- **Image Generator**: Generate visual representations of shoe designs
 
-## How It Works
+## Usage
 
-1. **Upload Images**: Add up to 10 reference images (shoes, sketches, inspiration photos)
-2. **Describe Your Vision**: Chat with the o3 model about your design ideas
-3. **Get Design Specifications**: Receive detailed, professional design prompts
-4. **Generate Images**: Copy the prompts to the image generator for visual results
-5. **Iterate and Refine**: Continue the conversation to perfect your design
+1. Go to the "Design Chat" tab
+2. Upload an image of shoes, sketches, or inspiration
+3. Describe your design ideas in the text box
+4. Get detailed design specifications from the AI
+5. Copy the generated prompt to the "Image Generator" tab
+6. Generate visual representations of your shoe design
+
+## Requirements
+
+- OpenAI API key (set as OPENAI_API_KEY environment variable)
+- fal.ai API key (set as FAL_KEY environment variable)
 
 ## Deployment on Hugging Face Spaces
 
