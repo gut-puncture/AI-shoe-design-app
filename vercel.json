@@ -7,8 +7,17 @@
   ],
   "routes": [
     {
+      "src": "/favicon.(ico|png)",
+      "dest": "/static/favicon.ico"
+    },
+    {
       "src": "/(.*)",
       "dest": "app.py"
     }
-  ]
+  ],
+  "functions": {
+    "app.py": {
+      "maxDuration": 30
+    }
+  }
 } 

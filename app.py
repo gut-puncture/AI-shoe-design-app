@@ -7,9 +7,14 @@ from PIL import Image
 import io
 import tempfile
 from werkzeug.utils import secure_filename
+import logging
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initialize clients
 openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -62,13 +67,63 @@ def encode_image_to_base64(image):
     img_str = base64.b64encode(buffered.getvalue()).decode()
     return f"data:image/png;base64,{img_str}"
 
+def call_openai_with_fallback(messages):
+    """Call OpenAI API with model fallback logic"""
+    # Try o3 first, then fall back to other models if access is restricted
+    models_to_try = ["o3", "gpt-4o", "gpt-4-turbo"]
+    
+    for model in models_to_try:
+        try:
+            logger.info(f"Trying model: {model}")
+            
+            if model == "o3":
+                response = openai_client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    max_completion_tokens=4000,
+                    reasoning_effort="medium"
+                )
+            else:
+                response = openai_client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    max_tokens=4000,
+                    temperature=0.7
+                )
+            
+            logger.info(f"Successfully used model: {model}")
+            return response, model
+            
+        except openai.NotFoundError as e:
+            logger.warning(f"Model {model} not found or not accessible: {str(e)}")
+            continue
+        except openai.AuthenticationError as e:
+            logger.error(f"Authentication error with {model}: {str(e)}")
+            raise e
+        except openai.RateLimitError as e:
+            logger.warning(f"Rate limit exceeded for {model}: {str(e)}")
+            continue
+        except Exception as e:
+            logger.warning(f"Error with {model}: {str(e)}")
+            continue
+    
+    raise Exception("All models failed or are not accessible")
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
+@app.route('/favicon.png')
+def favicon_png():
+    return '', 204
+
 @app.route('/api/chat', methods=['POST'])
 def chat_api():
-    """API endpoint for chat with o3 model"""
+    """API endpoint for chat with OpenAI models"""
     try:
         message = request.form.get('message', '')
         files = request.files.getlist('images')
@@ -77,7 +132,7 @@ def chat_api():
             return jsonify({'error': 'Please provide a message or upload images.'}), 400
         
         # Prepare messages for the API
-        messages = [{"role": "developer", "content": SYSTEM_PROMPT}]
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         
         # Prepare current message with images
         current_message_content = []
@@ -101,24 +156,31 @@ def chat_api():
                         })
                         processed_images += 1
                     except Exception as e:
+                        logger.warning(f"Failed to process image: {str(e)}")
                         continue  # Skip invalid images
         
         if current_message_content:
             messages.append({"role": "user", "content": current_message_content})
         
-        # Call OpenAI API
-        response = openai_client.chat.completions.create(
-            model="o3-2025-04-16",
-            messages=messages,
-            max_completion_tokens=4000,
-            reasoning_effort="high"
-        )
+        # Call OpenAI API with fallback logic
+        response, used_model = call_openai_with_fallback(messages)
         
         assistant_response = response.choices[0].message.content
-        return jsonify({'response': assistant_response})
         
+        # Add model info to response for debugging
+        response_data = {
+            'response': assistant_response,
+            'model_used': used_model
+        }
+        
+        return jsonify(response_data)
+        
+    except openai.AuthenticationError as e:
+        logger.error(f"Authentication error: {str(e)}")
+        return jsonify({'error': f'Authentication failed. Please check your API key: {str(e)}'}), 401
     except Exception as e:
-        return jsonify({'error': f'Error calling OpenAI API: {str(e)}'}), 500
+        logger.error(f"Unexpected error: {str(e)}")
+        return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
 
 @app.route('/api/generate', methods=['POST'])
 def generate_image_api():
