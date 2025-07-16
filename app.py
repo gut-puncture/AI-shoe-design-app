@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # Initialize clients
 openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# System prompt for o4-mini model
+# System prompt for o3 model
 SYSTEM_PROMPT = """You are **"PromptForge-O3-Footwear,"** an elite product-design assistant.
 Your sole task: given (a) up to 10 user-supplied reference images, (b) OPTIONAL brand names, and (c) OPTIONAL creative notes, you must return **one—and only one—finished image-generation prompt** ready for Fal.ai Imagen-4 (or any best-in-class model) that depicts a brand-new **SHOE** concept the label can manufacture.
 The user will paste your prompt directly into the image tool, so *no other text* (analysis, greetings, Markdown) is allowed in your answer.
@@ -69,8 +69,8 @@ def encode_image_to_base64(image):
 
 def call_openai_with_fallback(messages):
     """Call OpenAI API with model fallback logic"""
-    # Try o4-mini first, then fall back to other models if access is restricted
-    models_to_try = ["o4-mini-2025-04-16", "gpt-4o", "gpt-4-turbo"]
+    # Try o3 first, then fall back to other models if access is restricted
+    models_to_try = ["o3-2025-04-16", "gpt-4o", "gpt-4-turbo"]
     
     for model in models_to_try:
         try:
@@ -194,7 +194,7 @@ def generate_image_api():
         
         # Call fal.ai API
         result = fal_client.subscribe(
-            "fal-ai/imagen4/preview",
+            "fal-ai/imagen4/preview/ultra",
             arguments={
                 "prompt": prompt,
                 "aspect_ratio": "1:1",
