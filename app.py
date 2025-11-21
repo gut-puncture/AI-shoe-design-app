@@ -194,7 +194,7 @@ def generate_image_api():
         
         # Call fal.ai API
         result = fal_client.subscribe(
-            "fal-ai/imagen4/preview/ultra",
+            "fal-ai/nano-banana-pro",
             arguments={
                 "prompt": prompt,
                 "aspect_ratio": "1:1",
