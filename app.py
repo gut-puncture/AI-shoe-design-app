@@ -76,7 +76,7 @@ def call_openai_with_fallback(messages):
         try:
             logger.info(f"Trying model: {model}")
             
-            if model == "o4-mini-2025-04-16":
+            if model == "gpt-5.1-2025-11-13":
                 response = openai_client.chat.completions.create(
                     model=model,
                     messages=messages,
