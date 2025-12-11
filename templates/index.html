@@ -3,8 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦶 AI Shoe Designer</title>
+    <title>AI Shoe Designer Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --input-bg: #334155;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,72 +25,84 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
             min-height: 100vh;
-            color: #333;
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .tabs {
             display: flex;
-            background: white;
-            border-radius: 15px 15px 0 0;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .tab-button {
-            flex: 1;
-            padding: 20px;
-            background: #f8f9fa;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            height: fit-content;
+        }
+
+        .card-header {
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
             font-weight: 600;
-            transition: all 0.3s ease;
-            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .tab-button.active {
-            background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-        }
-
-        .tab-content {
-            display: none;
-            background: white;
-            padding: 40px;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            min-height: 600px;
-        }
-
-        .tab-content.active {
-            display: block;
+        .card-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
         .form-group {
@@ -86,371 +111,380 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .form-group textarea,
-        .form-group input {
+        textarea {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            color: var(--text-main);
+            font-family: inherit;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
             resize: vertical;
+            min-height: 120px;
+            transition: all 0.2s;
         }
 
-        .form-group textarea:focus,
-        .form-group input:focus {
+        textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
         }
 
-        .file-upload {
-            border: 2px dashed #ddd;
-            border-radius: 10px;
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
             padding: 40px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
+            transition: all 0.2s;
+            background: rgba(51, 65, 85, 0.3);
         }
 
-        .file-upload:hover {
-            border-color: #667eea;
-            background: #f0f2ff;
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
         }
 
-        .file-upload.dragover {
-            border-color: #667eea;
-            background: #e8f0fe;
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            display: block;
         }
 
-        .file-upload-input {
-            display: none;
+        .upload-text {
+            color: var(--text-main);
+            font-weight: 500;
         }
 
-        .file-upload-text {
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 10px;
+        .upload-subtext {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 5px;
         }
 
-        .file-upload-hint {
-            font-size: 0.9rem;
-            color: #999;
-        }
-
-        .uploaded-files {
-            margin-top: 15px;
+        .file-list {
+            margin-top: 20px;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
 
-        .uploaded-file {
-            display: inline-flex;
-            align-items: center;
-            background: #e8f0fe;
+        .file-chip {
+            background: var(--input-bg);
             padding: 8px 12px;
             border-radius: 20px;
-            font-size: 0.9rem;
-            color: #1a73e8;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border);
         }
 
-        .uploaded-file .remove-file {
-            margin-left: 8px;
+        .file-chip .remove {
             cursor: pointer;
-            color: #d93025;
+            color: var(--secondary);
             font-weight: bold;
         }
 
         .btn {
-            padding: 15px 30px;
+            width: 100%;
+            padding: 16px;
             border: none;
-            border-radius: 25px;
-            font-size: 1.1rem;
+            border-radius: 12px;
             font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         .btn-secondary {
-            background: #28a745;
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
         }
 
         .btn-secondary:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
-        .response-area {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .output-area {
+            background: var(--input-bg);
+            border-radius: 12px;
             padding: 20px;
             margin-top: 20px;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            border: 1px solid var(--border);
             min-height: 200px;
             white-space: pre-wrap;
-            font-family: 'Courier New', monospace;
-            line-height: 1.6;
         }
 
-        .generated-image {
-            margin-top: 20px;
+        .result-image-container {
+            margin-top: 30px;
             text-align: center;
+            position: relative;
         }
 
-        .generated-image img {
+        .result-image {
             max-width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
         }
 
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .loading.show {
-            display: block;
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            z-index: 10;
+            backdrop-filter: blur(4px);
         }
 
         .spinner {
-            display: inline-block;
             width: 40px;
             height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .error {
-            background: #f8d7da;
-            color: #721c24;
+        .badge {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-top: 15px;
-            border: 1px solid #f5c6cb;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            border: 1px solid #c3e6cb;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .tab-content {
-                padding: 20px;
-            }
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🦶 AI Shoe Designer</h1>
-            <p>Create amazing shoe designs with AI-powered assistance</p>
-        </div>
-
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab(event, 'chat-tab')">🗨️ Design Chat</button>
-            <button class="tab-button" onclick="openTab(event, 'generate-tab')">🎨 Image Generator</button>
-        </div>
-
-        <!-- Design Chat Tab -->
-        <div id="chat-tab" class="tab-content active">
-            <h2>Design Chat with GPT-5.1</h2>
-            <p style="margin-bottom: 30px; color: #666;">Upload up to 10 images and describe your design ideas. The AI will create detailed design specifications.</p>
-            
-            <form id="chat-form">
-                <div class="form-group">
-                    <label for="message">Your Message</label>
-                    <textarea id="message" name="message" rows="4" placeholder="Describe your shoe design ideas, brand inspiration, target audience, or any specific requirements..."></textarea>
+        <header class="header">
+            <div class="brand">
+                <span class="brand-icon">👟</span>
+                <div>
+                    <h1>PromptForge <span style="font-weight: 300;">Footwear</span></h1>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Powered by GPT-5.1 & Fal.ai Nano Banana Pro</p>
                 </div>
+            </div>
+            <div>
+                <span class="badge">v2.0 Beta</span>
+            </div>
+        </header>
 
-                <div class="form-group">
-                    <label>Upload Images (up to 10)</label>
-                    <div class="file-upload" onclick="document.getElementById('file-input').click()">
-                        <input type="file" id="file-input" class="file-upload-input" multiple accept="image/*">
-                        <div class="file-upload-text">📁 Click to upload images or drag & drop</div>
-                        <div class="file-upload-hint">Supported formats: JPG, PNG, GIF (Max 10 files)</div>
+        <div class="layout">
+            <!-- Left Column: Design Input -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>1. Design Brief</span>
                     </div>
-                    <div id="uploaded-files" class="uploaded-files"></div>
+                    <div class="card-subtitle">
+                        Describe your vision or upload references to generate a spec.
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Generate Design Specification</button>
-            </form>
+                <form id="design-form">
+                    <div class="form-group">
+                        <label for="message">Creative Direction</label>
+                        <textarea id="message" placeholder="E.g., 'A futuristic hiking boot for Mars exploration, utilizing aerogel insulation and recycled titanium hardware. Color palette: Dust Red and Void Black...'"></textarea>
+                    </div>
 
-            <div id="chat-loading" class="loading">
-                <div class="spinner"></div>
-                <p>AI is analyzing your images and creating design specifications...</p>
+                    <div class="form-group">
+                        <label>Reference Images (Max 10)</label>
+                        <div class="upload-zone" id="drop-zone">
+                            <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+                            <span class="upload-icon">📁</span>
+                            <div class="upload-text">Drop images here or click to browse</div>
+                            <div class="upload-subtext">JPG, PNG, WEBP supported</div>
+                        </div>
+                        <div id="file-list" class="file-list"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="generate-spec-btn">
+                        <span>✨ Generate Design Spec</span>
+                    </button>
+                </form>
+
+                <div id="spec-loading" class="loading-overlay" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Analyzing with GPT-5.1...</p>
+                </div>
             </div>
 
-            <div id="chat-response" class="response-area" style="display: none;"></div>
-        </div>
-
-        <!-- Image Generator Tab -->
-        <div id="generate-tab" class="tab-content">
-            <h2>Image Generator</h2>
-            <p style="margin-bottom: 30px; color: #666;">Generate visual representations of your shoe design using detailed prompts from the chat above.</p>
-            
-            <form id="generate-form">
-                <div class="form-group">
-                    <label for="prompt">Design Prompt</label>
-                    <textarea id="prompt" name="prompt" rows="8" placeholder="Paste the design prompt from the chat above or write your own detailed shoe design description..."></textarea>
+            <!-- Right Column: Visualization -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>2. Visualization</span>
+                    </div>
+                    <div class="card-subtitle">
+                        Review the generated prompt and render the design.
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-secondary">Generate Shoe Design</button>
-            </form>
+                <form id="render-form">
+                    <div class="form-group">
+                        <label for="prompt">Generated Prompt</label>
+                        <textarea id="prompt" placeholder="The AI-generated prompt will appear here..." style="font-family: 'Menlo', monospace; font-size: 0.85rem;"></textarea>
+                    </div>
 
-            <div id="generate-loading" class="loading">
-                <div class="spinner"></div>
-                <p>Generating your shoe design image...</p>
+                    <button type="submit" class="btn btn-secondary" id="render-btn">
+                        <span>🎨 Render Design (4K)</span>
+                    </button>
+                </form>
+
+                <div id="render-result" class="result-image-container">
+                    <!-- Image will appear here -->
+                </div>
+
+                <div id="render-loading" class="loading-overlay" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Rendering with Nano Banana Pro...</p>
+                </div>
             </div>
-
-            <div id="generated-image" class="generated-image"></div>
         </div>
     </div>
 
     <script>
-        // Tab switching
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
-
-        // File upload handling
+        // State
         let selectedFiles = [];
+
+        // DOM Elements
+        const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
-        const fileUpload = document.querySelector('.file-upload');
-        const uploadedFilesDiv = document.getElementById('uploaded-files');
+        const fileList = document.getElementById('file-list');
+        const designForm = document.getElementById('design-form');
+        const renderForm = document.getElementById('render-form');
+        const promptInput = document.getElementById('prompt');
+        const renderResult = document.getElementById('render-result');
 
-        fileInput.addEventListener('change', handleFileSelect);
+        // File Upload Handling
+        dropZone.addEventListener('click', () => fileInput.click());
 
-        // Drag and drop
-        fileUpload.addEventListener('dragover', (e) => {
+        dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            fileUpload.classList.add('dragover');
+            dropZone.classList.add('dragover');
         });
 
-        fileUpload.addEventListener('dragleave', () => {
-            fileUpload.classList.remove('dragover');
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
         });
 
-        fileUpload.addEventListener('drop', (e) => {
+        dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            fileUpload.classList.remove('dragover');
-            const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
-            handleFiles(files);
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
         });
 
-        function handleFileSelect(e) {
-            const files = Array.from(e.target.files);
-            handleFiles(files);
-        }
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
 
         function handleFiles(files) {
-            const totalFiles = selectedFiles.length + files.length;
-            if (totalFiles > 10) {
-                alert('Maximum 10 images allowed. Please remove some files first.');
+            const newFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+            if (selectedFiles.length + newFiles.length > 10) {
+                alert('Maximum 10 images allowed.');
                 return;
             }
 
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    selectedFiles.push(file);
-                }
-            });
-
-            updateFileDisplay();
+            selectedFiles = [...selectedFiles, ...newFiles];
+            updateFileList();
         }
 
-        function updateFileDisplay() {
-            uploadedFilesDiv.innerHTML = '';
+        function updateFileList() {
+            fileList.innerHTML = '';
             selectedFiles.forEach((file, index) => {
-                const fileDiv = document.createElement('div');
-                fileDiv.className = 'uploaded-file';
-                fileDiv.innerHTML = `
-                    ${file.name}
-                    <span class="remove-file" onclick="removeFile(${index})">×</span>
+                const chip = document.createElement('div');
+                chip.className = 'file-chip';
+                chip.innerHTML = `
+                    ${file.name.substring(0, 15)}${file.name.length > 15 ? '...' : ''}
+                    <span class="remove" onclick="removeFile(${index})">×</span>
                 `;
-                uploadedFilesDiv.appendChild(fileDiv);
+                fileList.appendChild(chip);
             });
         }
 
-        function removeFile(index) {
+        window.removeFile = (index) => {
             selectedFiles.splice(index, 1);
-            updateFileDisplay();
-        }
+            updateFileList();
+        };
 
-        // Chat form submission
-        document.getElementById('chat-form').addEventListener('submit', async (e) => {
+        // Design Spec Generation
+        designForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const message = document.getElementById('message').value;
-            const loading = document.getElementById('chat-loading');
-            const response = document.getElementById('chat-response');
-            
             if (!message && selectedFiles.length === 0) {
-                alert('Please provide a message or upload at least one image.');
+                alert('Please provide a description or upload images.');
                 return;
             }
 
-            loading.classList.add('show');
-            response.style.display = 'none';
+            const loading = document.getElementById('spec-loading');
+            const btn = document.getElementById('generate-spec-btn');
+
+            loading.style.display = 'flex';
+            btn.disabled = true;
 
             const formData = new FormData();
             formData.append('message', message);
-            selectedFiles.forEach(file => {
-                formData.append('images', file);
-            });
+            selectedFiles.forEach(file => formData.append('images', file));
 
             try {
                 const res = await fetch('/api/chat', {
@@ -459,64 +493,68 @@
                 });
 
                 const data = await res.json();
-                loading.classList.remove('show');
 
-                if (data.error) {
-                    response.innerHTML = `<div class="error">Error: ${data.error}</div>`;
-                } else {
-                    response.innerHTML = data.response;
-                    // Auto-copy to image generator
-                    document.getElementById('prompt').value = data.response;
-                }
-                response.style.display = 'block';
-            } catch (error) {
-                loading.classList.remove('show');
-                response.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-                response.style.display = 'block';
+                if (data.error) throw new Error(data.error);
+
+                promptInput.value = data.response;
+
+                // Visual feedback that something happened
+                promptInput.focus();
+                promptInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                loading.style.display = 'none';
+                btn.disabled = false;
             }
         });
 
-        // Generate form submission
-        document.getElementById('generate-form').addEventListener('submit', async (e) => {
+        // Image Rendering
+        renderForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const prompt = document.getElementById('prompt').value;
-            const loading = document.getElementById('generate-loading');
-            const imageDiv = document.getElementById('generated-image');
-            
-            if (!prompt.trim()) {
-                alert('Please provide a design prompt.');
+            const prompt = promptInput.value;
+            if (!prompt) {
+                alert('Please generate or enter a prompt first.');
                 return;
             }
 
-            loading.classList.add('show');
-            imageDiv.innerHTML = '';
+            const loading = document.getElementById('render-loading');
+            const btn = document.getElementById('render-btn');
+
+            loading.style.display = 'flex';
+            btn.disabled = true;
+            renderResult.innerHTML = ''; // Clear previous result
 
             try {
                 const res = await fetch('/api/generate', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt })
                 });
 
                 const data = await res.json();
-                loading.classList.remove('show');
 
-                if (data.error) {
-                    imageDiv.innerHTML = `<div class="error">Error: ${data.error}</div>`;
-                } else {
-                    imageDiv.innerHTML = `
-                        <div class="success">Design generated successfully!</div>
-                        <img src="${data.image_url}" alt="Generated Shoe Design" style="margin-top: 20px;">
-                    `;
-                }
-            } catch (error) {
-                loading.classList.remove('show');
-                imageDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                if (data.error) throw new Error(data.error);
+
+                renderResult.innerHTML = `
+                    <div style="margin-bottom: 10px; color: #10b981; font-weight: 600;">✨ Render Complete</div>
+                    <img src="${data.image_url}" class="result-image" alt="Generated Shoe">
+                    <div style="margin-top: 15px;">
+                        <a href="${data.image_url}" target="_blank" class="btn" style="background: var(--input-bg); font-size: 0.9rem;">
+                            ⬇️ Download Image
+                        </a>
+                    </div>
+                `;
+
+            } catch (err) {
+                renderResult.innerHTML = `<div class="error-msg">${err.message}</div>`;
+            } finally {
+                loading.style.display = 'none';
+                btn.disabled = false;
             }
         });
     </script>
 </body>
-</html> 
+</html>

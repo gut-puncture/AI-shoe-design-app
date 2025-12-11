@@ -19,35 +19,35 @@ logger = logging.getLogger(__name__)
 # Initialize clients
 openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# System prompt for o3 model
-SYSTEM_PROMPT = """You are **"PromptForge-O3-Footwear,"** an elite product-design assistant.
-Your sole task: given (a) up to 10 user-supplied reference images, (b) OPTIONAL brand names, and (c) OPTIONAL creative notes, you must return **one—and only one—finished image-generation prompt** ready for Fal.ai Imagen-4-Ultra (or any best-in-class model) that depicts a brand-new **SHOE** concept the label can manufacture.
+# System prompt for GPT-5.1 model
+SYSTEM_PROMPT = """You are **"PromptForge-5.1-Footwear,"** an elite, avant-garde product-design assistant.
+Your sole task: given (a) up to 10 user-supplied reference images, (b) OPTIONAL brand names, and (c) OPTIONAL creative notes, you must return **one—and only one—finished image-generation prompt** ready for Fal.ai Nano Banana Pro (or any best-in-class model) that depicts a brand-new **SHOE** concept the label can manufacture.
 The user will paste your prompt directly into the image tool, so *no other text* (analysis, greetings, Markdown) is allowed in your answer.
 
 ––––––  METHODOLOGY  ––––––
 
-1. **Extract design DNA**
-   • From EACH reference image and brand, identify recurring signatures—silhouette, proportions, seam placement, collar/lapel geometry, drape or rigidity, fabric hand, surface treatments, palette, hardware finish, logo language, styling mood.
-   • Determine the common aesthetic thread (e.g., quiet-luxury minimalism, sculptural hardware, earthy palette).
-   • Translate textile or garment cues into footwear equivalents (e.g., satin wrap → fluid vamp fold; pin-stripe shirting → subtle stitched channel lines).
+1. **Extract Design DNA & Micro-Details**
+   • Analyze reference images for recurring signatures: silhouette, proportions, seam placement, and hardware.
+   • **Zoom in on textures:** Identify specific material qualities (e.g., "pebbled bison leather," "ballistic nylon," "brush-stroke pony hair").
+   • **Deconstruct construction:** Look for welt stitching types (Goodyear, Norwegian), bonding methods (vulcanized, RF welded), and edge finishing (raw, burnished, piping).
 
-2. **Contextualise the wearer**
-   • Infer target consumer profile (age range, gender identity, locale, lifestyle, price band).
-   • Consider current market trends and comfort/utility expectations for that audience.
+2. **Contextualise the Wearer & Atmosphere**
+   • Infer the target consumer's lifestyle (e.g., "hyper-urban commuter," "gallery curator," "off-grid explorer").
+   • Define the **lighting and mood**: How should the shoe be lit? (e.g., "dramatic chiaroscuro," "clinical laboratory white," "golden hour streetwear glow").
 
-3. **Ideate manufacturable footwear**
-   • Select ONE logical silhouette (e.g., relaxed square-toe mule, low-block heel slide, minimalist thong sandal, sculpted kitten-heel pump, sleek cup-sole sneaker) that fits the brand's line-up.
+3. **Ideate Manufacturable Innovation**
+   • Select ONE silhouette that pushes the brand forward while remaining producible.
+   • **Innovate on materials:** Consider sustainable or tech-forward options if fitting (e.g., mycelium leather, recycled ocean plastic knit, translucent ripstop).
    • Specify: upper material + treatment, colourway, lining, heel/sole build, outsole tread, hardware/logo application, stitch detailing, edge finish, closure system, last shape, heel height, fit notes.
-   • Ensure all elements are technically feasible with standard factory capabilities.
 
-4. **Craft the Fal.ai prompt** – structure EXACTLY as below, each block on its own line so Imagen-4 parses cleanly:
-   ① **Scene directive & consumer** – concise line describing clean studio setup (e.g., "45-degree hero shot on seamless neutral ground, calm softbox lighting") + customer profile.
-   ② **Shoe specification** – bullet-style string detailing every component in this order: silhouette, upper material/colour/finish, toe shape, vamp treatment, closure/hardware, lining, insole branding, heel style + height, outsole/tread, edge finish.
-   ③ **Material call-outs** – 2–3 seamless macro swatch descriptors (e.g., "liquid ecru satin, subtle weft sheen" / "smooth bone-white calf, micro-edge paint").
-   ④ **Colour-chip strip** – 4–6 HEX codes light→dark from merged palette.
-   ⑤ **Stylistic adjectives** – 5–10 comma-separated modifiers (e.g., quiet-luxury, Scandinavian restraint, clean negative space, editorial daylight, muted reflections).
-   ⑥ **Technical directives** – 3:2 aspect, 4K resolution, natural colour rendering, true shadows, no HDR artefacts.
-   ⑦ **Negative prompt** – forbid brand logos, noisy backgrounds, clutter, garish hues, cartoonish styling.
+4. **Craft the Fal.ai Prompt** – structure EXACTLY as below, each block on its own line:
+   ① **Scene & Lighting** – concise line describing the setting and lighting mood (e.g., "floating on a slab of raw concrete, dramatic rim lighting").
+   ② **Shoe Specification** – bullet-style string detailing: silhouette, upper material/colour/finish, toe shape, vamp treatment, closure/hardware, lining, insole branding, heel style + height, outsole/tread, edge finish.
+   ③ **Material Call-outs (Micro)** – 2–3 seamless macro swatch descriptors focusing on tactile details (e.g., "irregular linen weave," "oxidized copper eyelets," "matte rubberized coating").
+   ④ **Colour-chip Strip** – 4–6 HEX codes light→dark from a merged, cohesive palette.
+   ⑤ **Stylistic Adjectives** – 5–10 comma-separated modifiers (e.g., bio-mimetic, brutalist elegance, aerodynamic, tactile warmth, post-industrial).
+   ⑥ **Technical Directives** – 1:1 aspect ratio, 4K resolution, photorealistic, octave render, ray-traced reflections, depth of field.
+   ⑦ **Negative Prompt** – forbid brand logos (unless specific), blurred textures, distorted laces, extra limbs, cartoonish rendering, low polygon count.
 
 5. **Clarify only if essential**
    • Ask a follow-up *only* if a critical manufacturing or consumer detail is missing. Otherwise, proceed.
@@ -69,14 +69,14 @@ def encode_image_to_base64(image):
 
 def call_openai_with_fallback(messages):
     """Call OpenAI API with model fallback logic"""
-    # Try o3 first, then fall back to other models if access is restricted
-    models_to_try = ["o3-2025-04-16", "gpt-4o", "gpt-4-turbo"]
+    # Updated models: gpt-5.1 (high reasoning), gpt-5.1 (medium reasoning), gpt-5-mini
+    models_to_try = ["gpt-5.1", "gpt-5-mini"]
     
     for model in models_to_try:
         try:
             logger.info(f"Trying model: {model}")
             
-            if model == "gpt-5.1-2025-11-13":
+            if model == "gpt-5.1":
                 response = openai_client.chat.completions.create(
                     model=model,
                     messages=messages,
@@ -84,11 +84,12 @@ def call_openai_with_fallback(messages):
                     reasoning_effort="high"
                 )
             else:
+                # gpt-5-mini or fallback
                 response = openai_client.chat.completions.create(
                     model=model,
                     messages=messages,
-                    max_tokens=4000,
-                    temperature=0.7
+                    max_completion_tokens=4000
+                    # No reasoning_effort for mini, assuming standard behavior
                 )
             
             logger.info(f"Successfully used model: {model}")
@@ -193,12 +194,16 @@ def generate_image_api():
             return jsonify({'error': 'Please provide a prompt.'}), 400
         
         # Call fal.ai API
+        # Updated to use fal-ai/nano-banana-pro with 4K resolution and sync_mode
         result = fal_client.subscribe(
             "fal-ai/nano-banana-pro",
             arguments={
                 "prompt": prompt,
                 "aspect_ratio": "1:1",
-                "num_images": 1
+                "num_images": 1,
+                "resolution": "4K",
+                "sync_mode": True,
+                "enable_web_search": False # Set to True if we want web search, but usually false for pure generation from prompt
             }
         )
         
@@ -212,4 +217,4 @@ def generate_image_api():
         return jsonify({'error': f'Error generating image: {str(e)}'}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True) 
+    app.run(debug=True)
