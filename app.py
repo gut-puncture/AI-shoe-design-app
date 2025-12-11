@@ -7,9 +7,11 @@ from PIL import Image
 import io
 import tempfile
 from werkzeug.utils import secure_filename
+from flask_cors import CORS
 import logging
 
 app = Flask(__name__)
+CORS(app)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Configure logging
