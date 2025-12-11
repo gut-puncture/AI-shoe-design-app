@@ -469,7 +469,7 @@
         };
 
         // Image Resizing Utility
-        async function resizeImage(file, maxWidth = 1024, quality = 0.8) {
+        async function resizeImage(file, maxWidth = 800, quality = 0.7) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -480,6 +480,7 @@
                         let width = img.width;
                         let height = img.height;
 
+                        // Always resize if larger than maxWidth
                         if (width > maxWidth || height > maxWidth) {
                             if (width > height) {
                                 height = Math.round((height * maxWidth) / width);
@@ -496,8 +497,9 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
+                        // Force JPEG for better compression
                         canvas.toBlob((blob) => {
-                            resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                            resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg' }));
                         }, 'image/jpeg', quality);
                     };
                 };

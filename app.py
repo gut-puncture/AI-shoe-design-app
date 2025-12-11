@@ -146,12 +146,23 @@ def chat_api():
         
         # Add images if provided (up to 10)
         if files:
+            logger.info(f"Processing {len(files)} uploaded files.")
             processed_images = 0
             for file in files[:10]:  # Limit to 10 images
                 if file and file.filename:
                     try:
+                        # Check file size (approximate from stream if possible, or just log)
+                        file.stream.seek(0, os.SEEK_END)
+                        size = file.stream.tell()
+                        file.stream.seek(0)
+                        logger.info(f"Processing file: {file.filename}, size: {size} bytes")
+
                         # Open and process the image
                         pil_img = Image.open(file.stream)
+                        # Ensure we convert to RGB (handle PNGs with alpha that might be large)
+                        if pil_img.mode in ('RGBA', 'P'):
+                            pil_img = pil_img.convert('RGB')
+
                         base64_image = encode_image_to_base64(pil_img)
                         current_message_content.append({
                             "type": "image_url",
@@ -159,7 +170,7 @@ def chat_api():
                         })
                         processed_images += 1
                     except Exception as e:
-                        logger.warning(f"Failed to process image: {str(e)}")
+                        logger.warning(f"Failed to process image {file.filename}: {str(e)}")
                         continue  # Skip invalid images
         
         if current_message_content:
