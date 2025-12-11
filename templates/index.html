@@ -492,9 +492,24 @@
                     body: formData
                 });
 
-                const data = await res.json();
+                let data;
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    try {
+                        data = await res.json();
+                    } catch (e) {
+                        data = null;
+                    }
+                } else {
+                    const text = await res.text();
+                    if (!res.ok) throw new Error(text || `Server returned ${res.status} ${res.statusText}`);
+                }
 
-                if (data.error) throw new Error(data.error);
+                if (!res.ok) {
+                    throw new Error((data && data.error) ? data.error : `Server returned ${res.status} ${res.statusText}`);
+                }
+
+                if (!data) throw new Error("Received empty or invalid response from server");
 
                 promptInput.value = data.response;
 
@@ -534,9 +549,24 @@
                     body: JSON.stringify({ prompt })
                 });
 
-                const data = await res.json();
+                let data;
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    try {
+                        data = await res.json();
+                    } catch (e) {
+                        data = null;
+                    }
+                } else {
+                    const text = await res.text();
+                    if (!res.ok) throw new Error(text || `Server returned ${res.status} ${res.statusText}`);
+                }
 
-                if (data.error) throw new Error(data.error);
+                if (!res.ok) {
+                    throw new Error((data && data.error) ? data.error : `Server returned ${res.status} ${res.statusText}`);
+                }
+
+                if (!data) throw new Error("Received empty or invalid response from server");
 
                 renderResult.innerHTML = `
                     <div style="margin-bottom: 10px; color: #10b981; font-weight: 600;">✨ Render Complete</div>
